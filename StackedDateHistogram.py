@@ -71,7 +71,7 @@ class StackedDateHistogram:
 
     def save_plot(self, filename, period_grouping=""):
         self._grouped_df = self._group_data().unstack()
-        self._grouped_df.plot(kind=self._chart_type, stacked=True)
+        self._grouped_df.plot(kind=self._chart_type, stacked=True, width=0.8)
         plt.xticks(rotation=90)
         plt.tight_layout()
         plt.savefig(filename)
