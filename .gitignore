@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+aws-log-text-forensics.code-workspace
+reports/**/**
+logs/**/**
+search
+log_list.txt
+temp_log_list.txt
+search_results.*
+*.png
