@@ -6,7 +6,6 @@ aws logs describe-log-groups | grep logGroupName | sed "s/\"logGroupName\"://g" 
 # Reorder or exclude logs here to create the log_list.txt file
 grep -v -E "CloudTrail" temp_log_list.txt > log_list.txt
 
-rm _aws*.*
 
 export day_prefix=$(date +"%Y-%m-%d")
 mkdir logs/$day_prefix
