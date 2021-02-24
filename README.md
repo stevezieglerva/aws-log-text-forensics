@@ -85,6 +85,12 @@ Do an empty search to see the metrics for all logs. Any empty log files encounte
 > python3 search_logs.py ""
 ```
 
+Open the resulting search_results.html to see the charts and sample matches.
+
+![](docs/html_sample.png)
+
+
+
 Search for "error"
 ```
 > python3 search_logs.py "error"
