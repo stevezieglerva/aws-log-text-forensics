@@ -46,9 +46,23 @@ Removed empty logs: 0
 - AWS CLI
 - [awslogs](https://github.com/jorgebastida/awslogs) 
 
+
+## Usage
+```
+usage: search_logs.py [-h] [--exclude EXCLUDE] [--tmsp TMSP] [--log LOG]
+                      [--log-exclude LOG_EXCLUDE]
+                      message
+```
+
+* message - required regex to match the log lines
+* excluded - optional regex to exclude the log lines
+* log - optional regex to filter the logs processed. Defaults to ".*" to include all logs in logs/
+* log-exclude - optional regex to exclude the logs processed. Defaults to "" to include all logs in logs/
+
+
 ## Getting started
 ### Download recent logs
-- Run the [get_all_logs.sh](get_all_logs.sh) script to download the last 24 hours of logs. Depending on the number and size of the logs, it could take over an hour to run. The logs will be put into the logs/<date>/ directory. 
+- Run the [get_all_logs.sh](get_all_logs.sh) script to download the last 24 hours of logs. Depending on the number and size of the logs, it could take over an hour to run. It will try to download all log groups, even those that have not been updated recently. The logs will be put into the logs/<date>/ directory. 
 ```
 > . get_all_logs.sh
 Getting all log group names
@@ -66,7 +80,29 @@ Getting sample of logs
 - To keep exports organized, you can create new directories unders logs/ to group files by AWS account or incident. The tool will search any files under logs/. 
 
 ### Search the logs
-Do an empty search to see the metrics for all logs
+Do an empty search to see the metrics for all logs. Any empty log files encountered will be removed at the end of processing. All paramterrs take regex expressions.
+```
+> python3 search_logs.py ""
+```
 
+Search for "error"
+```
+> python3 search_logs.py "error"
+```
+
+Search for "error" but exclude the false positive for "ops-aws-fake-cw-errors-new"
+```
+> python3 search_logs.py "error" --exclude "ops-aws-fake-cw-errors-new"
+```
+
+Search for "error", but exclude the false positive for "ops-aws-fake-cw-errors-new", and exclude the log for "ops-aws-analyze-metrics-frequency"
+```
+> python3 search_logs.py "error" --exclude "ops-aws-fake-cw-errors-new" --log-exclude "ops-aws-analyze-metrics-frequency"
+```
+
+Search for "error", exclude the false positive for "ops-aws-fake-cw-errors-new", exclude the log for "ops-aws-analyze-metrics-frequency", and search for the :05 minute mark of 09:00, 10:00, or 11:00.
+```
+ python3 search_logs.py "error" --exclude "ops-aws-fake-cw-errors-new" --log-exclude "ops-aws-analyze-metrics-frequency" tmsp="T(09|10|11):05"
+ ```
 
 
