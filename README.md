@@ -1,11 +1,11 @@
-# aws-log-text-forensics
+# aws-log-text-forensics 🔎
 
-Set of scripts to download CloudWatch logs locally to perform forensics searching. This is a slower, cheaper alternative to real continuous monitoring tools like ELK and Splunk. But, for small accounts without any log monitoring, this can be a decent alternartive to instigate incidents. The process creates an HTML page with some charts visualizing the matches and a sample of matcheded log lines.
+Set of scripts to download CloudWatch logs locally and perform forensics searching. This is a slower, cheaper alternative to real continuous monitoring tools like ELK and Splunk. Those tools are recommended for any medium to large system. But, for small accounts without any log monitoring, this can be a decent alternartive to investigate incidents. The process creates an HTML page with some charts visualizing the matches and a sample of matched log lines.
 
-After the logs are downloaded, they can be searched via a Python command line. The command below will search all logs whose path match the "2021-02-14.*ec2" regex, but exclude "httpd" logs, looking for lines with the word "error" but not "no errors found."
+After the logs are downloaded, they can be searched via a Python command line. The command below will search all logs whose path match the "2021-02-14.*ec2" regex (but exclude "httpd" logs), occurring in the from 08:00:00 through 10:59:00, looking for lines with the word "error" but not "no errors found."
 
 ```
- > python3 search_logs.py --log "2021-02-14.*ec2" --log-exclude "httpd" --exclude "no errors found" "error"
+ > python3 search_logs.py --log "2021-02-14.*ec2" --log-exclude "httpd" --tmsp "T(08|09|10)" --exclude "no errors found" "error"
 
 Namespace(exclude='', log='gw', log_exclude='ops-aws', message="\\+1[0-9]+'", tmsp='.*')
 Found logs:                63
@@ -42,8 +42,15 @@ Removed empty logs: 0
 ![](docs/treemap.png)
 ![](docs/sample_log_lines.png)
 ## Pre-reqs
-
+- Python3
+- AWS CLI
+- [awslogs](https://github.com/jorgebastida/awslogs) 
 
 ## Getting started
+### Download recent logs
+- Run the [get_all_logs.sh](get_all_logs.sh) script to download the last 24 hours of logs
+```
+> . get_all_logs.sh
+```
 
 
