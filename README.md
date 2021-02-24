@@ -48,9 +48,25 @@ Removed empty logs: 0
 
 ## Getting started
 ### Download recent logs
-- Run the [get_all_logs.sh](get_all_logs.sh) script to download the last 24 hours of logs
+- Run the [get_all_logs.sh](get_all_logs.sh) script to download the last 24 hours of logs. Depending on the number and size of the logs, it could take over an hour to run. The logs will be put into the logs/<date>/ directory. 
 ```
 > . get_all_logs.sh
+Getting all log group names
+mkdir: logs/2021-02-24: File exists
+Date: Wed Feb 24 13:12:11 EST 2021 ifif y
+Getting sample of logs
+/aws-glue/crawlers
+/aws/aes/domains/ziegler-es-2019/application-logs
+/aws/aes/domains/ziegler-es-2019/search-logs
+/aws/aes/domains/ziegler-es/application-logs
+/aws/codebuild/cloudtrail
+/aws/codebuild/cloudtrail-log-analytics
+...
 ```
+- To keep exports organized, you can create new directories unders logs/ to group files by AWS account or incident. The tool will search any files under logs/. 
+
+### Search the logs
+Do an empty search to see the metrics for all logs
+
 
 

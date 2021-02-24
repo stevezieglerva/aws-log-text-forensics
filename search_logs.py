@@ -296,7 +296,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--log",
         type=str,
-        default="logs/**/*.*",
+        default=".*",
         help="glob filter for the log column",
     )
     parser.add_argument(
