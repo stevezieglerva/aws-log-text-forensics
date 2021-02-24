@@ -45,6 +45,10 @@ Removed empty logs: 0
 - Python3
 - AWS CLI
 - [awslogs](https://github.com/jorgebastida/awslogs) 
+- Install the requirements
+```
+pip install -r requirements.txt
+```
 
 
 ## Usage
