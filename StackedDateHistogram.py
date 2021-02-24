@@ -21,8 +21,6 @@ class StackedDateHistogram:
         self._input_df = df
         plt.style.use("seaborn")
 
-        # plt.show()
-
     def set_max_groupings(self, max_groupings):
         self._max_groupings = max_groupings
 
@@ -70,8 +68,11 @@ class StackedDateHistogram:
         return json_dict
 
     def save_plot(self, filename, period_grouping=""):
+        fig, ax = plt.subplots()
         self._grouped_df = self._group_data().unstack()
-        self._grouped_df.plot(kind=self._chart_type, stacked=True, width=0.8)
+        self._grouped_df.plot(kind=self._chart_type, stacked=True, width=0.8, ax=ax)
         plt.xticks(rotation=90)
+        # ax.set_axisbelow(True)
+        # ax.grid(linestyle="-", linewidth="0.25", color="lightgray")
         plt.tight_layout()
         plt.savefig(filename)
