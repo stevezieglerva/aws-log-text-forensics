@@ -2,7 +2,7 @@
 
 Set of scripts to download CloudWatch logs locally and perform forensics searching. This is a slower, cheaper alternative to real continuous monitoring tools like ELK and Splunk. Those tools are recommended for any medium to large system. But, for small accounts without any log monitoring, this can be a decent alternartive to investigate incidents. The process creates an HTML page with some charts visualizing the matches and a sample of matched log lines.
 
-After the logs are downloaded, they can be searched via a Python command line. The command below will search all logs whose path match the "2021-02-14.*ec2" regex (but exclude "httpd" logs), occurring in the from 08:00:00 through 10:59:00, looking for lines with the word "error" but not "no errors found."
+After the logs are downloaded, they can be searched via a Python command line. The command below will search all logs whose path match the "2021-02-14.*ec2" regex (but exclude "httpd" logs), occurring from 08:00:00 through 10:59:00, looking for lines with the word "error" but not "no errors found."
 
 ```
  > python3 search_logs.py --log "2021-02-14.*ec2" --log-exclude "httpd" --tmsp "T(08|09|10)" --exclude "no errors found" "error"
