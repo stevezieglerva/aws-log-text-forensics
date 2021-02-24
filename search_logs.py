@@ -64,7 +64,10 @@ def main(args):
     output = output.strip()
     print(f"Read lines:    {read_lines:>14,}")
     print(f"Read bytes:    {read_bytes:>14,}")
-    print(f"Found matches: {match_counts:>14,}")
+    found_emoji = "✅"
+    if match_counts == 0:
+        found_emoji = "❌"
+    print(f"Found matches: {match_counts:>14,} {found_emoji}")
     with open("search_results.csv", "w") as csv:
         csv.write(output)
     end = datetime.now()
