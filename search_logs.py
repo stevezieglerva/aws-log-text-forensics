@@ -3,8 +3,10 @@ import glob
 import json
 import os
 import re
+from dataclasses import dataclass
 from datetime import datetime
 from subprocess import call
+from typing import List
 
 import matplotlib
 import pandas as pd
@@ -17,6 +19,21 @@ from StackedDateHistogram import StackedDateHistogram
 PERIOD_FORMAT_HOURS = "H"
 PERIOD_FORMAT_MINS = "min"
 PERIOD_FORMAT_SECS = "S"
+
+
+@dataclass(frozen=True)
+class PatternMatch:
+    pattern: str
+    matches: List[str]
+    count: int
+
+
+@dataclass(frozen=True)
+class LineMatch:
+    tmsp: str
+    log: str
+    message: str
+    pattern_matches: List[PatternMatch]
 
 
 def include_log(args, log):
@@ -34,6 +51,7 @@ def include_log(args, log):
 
 
 def main(args):
+    lines_matches = []
     start = datetime.now()
     all_logs = glob.glob("logs/**/*.*", recursive=True)
     filtered_logs = []
@@ -65,6 +83,15 @@ def main(args):
                 if is_match(tmsp, message, args):
                     match_counts = match_counts + 1
                     output = output + f'{tmsp},"{log}","{message}",1\n'
+                    pattern_matches = count_matched_word_patterns(args.message, message)
+                    lines_matches.append(
+                        LineMatch(
+                            tmsp=tmsp,
+                            log=log,
+                            message=message,
+                            pattern_matches=pattern_matches,
+                        )
+                    )
     output = output.strip()
     print(f"Read lines:    {read_lines:>14,}")
     print(f"Read bytes:    {read_bytes:>14,}")
@@ -215,6 +242,15 @@ def is_match(tmsp, message, args):
             if re.findall(args.exclude, message, flags=re.I):
                 return False
         return True
+
+
+def count_matched_word_patterns(match_expression: str, text: str) -> List[PatternMatch]:
+    results = []
+    re_list = match_expression.split("|")
+    for re_pattern in re_list:
+        matches = re.findall(re_pattern, text, re.IGNORECASE)
+        results.append(PatternMatch(re_pattern, matches, len(matches)))
+    return results
 
 
 def split_fields_from_line(line):

@@ -2,3 +2,5 @@ pandas
 matplotlib
 plotly
 kaleido
+html-testRunner
+coverage
