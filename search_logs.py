@@ -12,6 +12,7 @@ import matplotlib
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+from pandas.core.frame import DataFrame
 
 from Histogram import Histogram
 from StackedDateHistogram import StackedDateHistogram
@@ -114,6 +115,12 @@ def main(args):
     hist_counts.set_chart_type("barh")
     hist_counts.save_plot("log_counts.png")
 
+    pattern_df = pd.read_csv("search_results_by_pattern.csv")
+    period_column_name = add_new_date_columns(pattern_df)
+    pattern_datehistorgram_filename = create_pattern_datehistogram(
+        pattern_df, period_column_name
+    )
+
     print("Creating treemap")
     create_treemap(df)
 
@@ -132,6 +139,9 @@ def main(args):
         html = html + f"log_exclude: {args.log_exclude}<br/>"
         html = html + "<img width='600px' src='search_date_histogram.png'/>\n"
         html = html + "<img width='600px' src='log_counts.png'/>\n"
+        html = (
+            html + "<img width='600px' src='search_date_histogram_by_pattern.png'/>\n"
+        )
         html = html + "<a href='treemap_big.png'><img src='treemap.png'/></a>\n"
         html = html + "<br/><br/><h2>Sample matches from logs</h2>\n"
 
@@ -248,8 +258,15 @@ def add_new_date_columns(df):
     return period_column_name
 
 
-def create_pattern_datehistogram(df):
-    return ""
+def create_pattern_datehistogram(df: DataFrame, period_column_name: str):
+    hist = StackedDateHistogram(period_column_name, "pattern", "count", df)
+    hist.set_aggregation("sum")
+    hist.set_chart_type("bar")
+    hist.set_max_groupings(10)
+
+    filename = "search_date_histogram_by_pattern.png"
+    hist.save_plot(filename)
+    return filename
 
 
 def get_chart_period_size(min_date, max_date):

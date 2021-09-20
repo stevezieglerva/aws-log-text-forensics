@@ -1,5 +1,5 @@
 # Manual filter of logs to retrieve
-export log_group_filter="ZillowParseIndividualHTMLFuncti"
+export log_group_filter="zillow" #"ZillowParseIndividualHTMLFuncti"
 export duration="2h"
 #export log_group_terms_filter="?START ?END ?line ?url ?ERROR ?processed ?s3 ?key ?Skipping ?Adding"
 
