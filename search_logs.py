@@ -1,19 +1,18 @@
 import argparse
 import glob
-import os
-from subprocess import call
-import re
 import json
+import os
+import re
 from datetime import datetime
+from subprocess import call
 
 import matplotlib
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-from StackedDateHistogram import StackedDateHistogram
 from Histogram import Histogram
-
+from StackedDateHistogram import StackedDateHistogram
 
 PERIOD_FORMAT_HOURS = "H"
 PERIOD_FORMAT_MINS = "min"
@@ -21,7 +20,12 @@ PERIOD_FORMAT_SECS = "S"
 
 
 def include_log(args, log):
-    if re.findall(args.log, log, flags=re.I):
+    log_filter = args.log
+    tmsp_filter_includes_hour_matches = re.search("T[^:]+", args.tmsp)
+    if tmsp_filter_includes_hour_matches:
+        log_filter = log_filter + ".*" + tmsp_filter_includes_hour_matches.group(0)
+
+    if re.findall(log_filter, log, flags=re.I):
         if args.log_exclude != "":
             if re.findall(args.log_exclude, log, flags=re.I):
                 return False
@@ -45,7 +49,7 @@ def main(args):
     read_bytes = 0
     empty_files_to_remove = []
     for log_count, local_log in enumerate(filtered_logs):
-        if log_count % 1000 == 0 and log_count > 0:
+        if log_count % 100 == 0 and log_count > 0:
             print(f"\t{log_count}")
         with open(local_log, "r") as file:
             lines = file.readlines()
@@ -180,7 +184,7 @@ def main(args):
 
 
 def get_chart_period_size(min_date, max_date):
-    max_increments = 6
+    max_increments = 3
     hours_limit = 60 * 60 * max_increments
     mins_limit = 60 * max_increments
     duration = max_date - min_date
@@ -219,10 +223,10 @@ def split_fields_from_line(line):
         if len(words) >= 3:
             log_name = words[0].strip()
             tmsp = words[2].strip()
-            tmsp_with_microseconds = tmsp[:-5]
+            tmsp_without_microseconds = tmsp[:-5]
             first_words = words[0] + " " + words[1] + " " + words[2]
             message = line.replace(first_words, "").strip().replace('"', "'")
-            return (tmsp_with_microseconds, log_name, message)
+            return (tmsp_without_microseconds, log_name, message)
     return (None, None, None)
 
 
@@ -296,7 +300,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--log",
         type=str,
-        default=".*",
+        default="partitioned",
         help="glob filter for the log column",
     )
     parser.add_argument(

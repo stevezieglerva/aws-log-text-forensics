@@ -60,7 +60,7 @@ usage: search_logs.py [-h] [--exclude EXCLUDE] [--tmsp TMSP] [--log LOG]
 
 * message - required regex to match the log lines
 * excluded - optional regex to exclude the log lines
-* log - optional regex to filter the logs processed. Defaults to ".*" to include all logs in logs/
+* log - optional regex to filter the logs processed. Defaults to "partitioned" to include all logs in logs/partitioned
 * log-exclude - optional regex to exclude the logs processed. Defaults to "" to include all logs in logs/
 
 
