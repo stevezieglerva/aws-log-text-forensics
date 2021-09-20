@@ -133,6 +133,6 @@ logs/**/**
 search
 log_list.txt
 temp_log_list.txt
-search_results.*
+search_results*.*
 /*.png
 temp_manual_filter_log_list.txt
