@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, Mock, PropertyMock, patch
 
+import pandas as pd
 from search_logs import *
 
 
@@ -23,6 +24,16 @@ class ForensicsUnitTests(unittest.TestCase):
                 PatternMatch(pattern="o[^ ]+", matches=["old", "Ollie"], count=2),
             ],
         )
+
+    def test_create_pattern_datehistogram__given_data__then_plot_saved(self):
+        # Arrange
+        df = pd.read_csv("tests/search_results_by_pattern.csv")
+
+        # Act
+        results = create_pattern_datehistogram(df)
+
+        # Assert
+        self.assertEqual(results, "plot_x.png")
 
 
 if __name__ == "__main__":

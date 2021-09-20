@@ -66,37 +66,21 @@ def main(args):
     read_lines = 0
     read_bytes = 0
     empty_files_to_remove = []
-    for log_count, local_log in enumerate(filtered_logs):
-        if log_count % 100 == 0 and log_count > 0:
-            print(f"\t{log_count}")
-        with open(local_log, "r") as file:
-            lines = file.readlines()
-            lines_in_log = len(lines)
-            if lines_in_log == 0:
-                empty_files_to_remove.append(local_log)
-            read_lines = read_lines + len(lines)
-            for line in lines:
-                read_bytes = read_bytes + len(line)
-                tmsp, log, message = split_fields_from_line(line)
-                if tmsp is None:
-                    continue
-                if is_match(tmsp, message, args):
-                    match_counts = match_counts + 1
-                    output = output + f'{tmsp},"{log}","{message}",1\n'
-                    pattern_matches = count_matched_word_patterns(args.message, message)
-                    lines_matches.append(
-                        LineMatch(
-                            tmsp=tmsp,
-                            log=log,
-                            message=message,
-                            pattern_matches=pattern_matches,
-                        )
-                    )
+    output, match_counts, read_lines, read_bytes = read_logs(
+        args,
+        lines_matches,
+        filtered_logs,
+        output,
+        match_counts,
+        read_lines,
+        read_bytes,
+        empty_files_to_remove,
+    )
     with open("search_results_by_pattern.csv", "w") as file:
         text = "tmsp,pattern,count\n"
         for line in lines_matches:
             for pattern in line.pattern_matches:
-                line_str = f'{line.tmsp},"{pattern.pattern}"",{pattern.count}\n'
+                line_str = f'{line.tmsp},"{pattern.pattern}",{pattern.count}\n'
                 text = text + line_str
         file.write(text)
 
@@ -118,18 +102,7 @@ def main(args):
 
     df = pd.read_csv("search_results.csv")
 
-    df["new_date"] = pd.to_datetime(df["tmsp"], format="%Y-%m-%dT%H:%M:%S")
-
-    min_date = df["new_date"].min()
-    max_date = df["new_date"].max()
-    date_range = max_date - min_date
-    print(f"Data from {min_date} to {max_date} ({date_range})")
-    period = get_chart_period_size(min_date, max_date)
-    period_column_name = get_column_name_from_period(period)
-
-    df[period_column_name] = pd.to_datetime(
-        df["tmsp"], format="%Y-%m-%dT%H:%M:%S"
-    ).dt.to_period(period)
+    period_column_name = add_new_date_columns(df)
 
     hist = StackedDateHistogram(period_column_name, "log", "count", df)
     hist.set_aggregation("count")
@@ -216,6 +189,67 @@ def main(args):
     for file in empty_files_to_remove:
         os.remove(file)
     print(f"Removed empty logs: {empty_log_count}")
+
+
+def read_logs(
+    args,
+    lines_matches,
+    filtered_logs,
+    output,
+    match_counts,
+    read_lines,
+    read_bytes,
+    empty_files_to_remove,
+):
+    for log_count, local_log in enumerate(filtered_logs):
+        if log_count % 100 == 0 and log_count > 0:
+            print(f"\t{log_count}")
+        with open(local_log, "r") as file:
+            lines = file.readlines()
+            lines_in_log = len(lines)
+            if lines_in_log == 0:
+                empty_files_to_remove.append(local_log)
+            read_lines = read_lines + len(lines)
+            for line in lines:
+                read_bytes = read_bytes + len(line)
+                tmsp, log, message = split_fields_from_line(line)
+                if tmsp is None:
+                    continue
+                if is_match(tmsp, message, args):
+                    match_counts = match_counts + 1
+                    output = output + f'{tmsp},"{log}","{message}",1\n'
+                    pattern_matches = count_matched_word_patterns(args.message, message)
+                    lines_matches.append(
+                        LineMatch(
+                            tmsp=tmsp,
+                            log=log,
+                            message=message,
+                            pattern_matches=pattern_matches,
+                        )
+                    )
+
+    return output, match_counts, read_lines, read_bytes
+
+
+def add_new_date_columns(df):
+    df["new_date"] = pd.to_datetime(df["tmsp"], format="%Y-%m-%dT%H:%M:%S")
+
+    min_date = df["new_date"].min()
+    max_date = df["new_date"].max()
+    date_range = max_date - min_date
+    print(f"Data from {min_date} to {max_date} ({date_range})")
+    period = get_chart_period_size(min_date, max_date)
+    period_column_name = get_column_name_from_period(period)
+
+    df[period_column_name] = pd.to_datetime(
+        df["tmsp"], format="%Y-%m-%dT%H:%M:%S"
+    ).dt.to_period(period)
+
+    return period_column_name
+
+
+def create_pattern_datehistogram(df):
+    return ""
 
 
 def get_chart_period_size(min_date, max_date):
