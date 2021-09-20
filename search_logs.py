@@ -92,6 +92,14 @@ def main(args):
                             pattern_matches=pattern_matches,
                         )
                     )
+    with open("search_results_by_pattern.csv", "w") as file:
+        text = "tmsp,pattern,count\n"
+        for line in lines_matches:
+            for pattern in line.pattern_matches:
+                line_str = f'{line.tmsp},"{pattern.pattern}"",{pattern.count}\n'
+                text = text + line_str
+        file.write(text)
+
     output = output.strip()
     print(f"Read lines:    {read_lines:>14,}")
     print(f"Read bytes:    {read_bytes:>14,}")
