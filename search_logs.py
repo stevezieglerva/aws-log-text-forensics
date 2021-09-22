@@ -37,6 +37,14 @@ class LineMatch:
     pattern_matches: List[PatternMatch]
 
 
+@dataclass(frozen=True)
+class SplitFields:
+    tmsp: str
+    process_id: str
+    log: str
+    message: str
+
+
 def include_log(args, log):
     log_filter = args.log
     tmsp_filter_includes_hour_matches = re.search("T[^:]+", args.tmsp)
@@ -222,9 +230,12 @@ def read_logs(
             read_lines = read_lines + len(lines)
             for line in lines:
                 read_bytes = read_bytes + len(line)
-                tmsp, log, message = split_fields_from_line(line)
-                if tmsp is None:
+                split_fields = split_fields_from_line(line)
+                if split_fields is None:
                     continue
+                tmsp = split_fields.tmsp
+                message = split_fields.message
+                log = split_fields.log
                 if is_match(tmsp, message, args):
                     match_counts = match_counts + 1
                     output = output + f'{tmsp},"{log}","{message}",1\n'
@@ -321,8 +332,13 @@ def split_fields_from_line(line):
             tmsp_without_microseconds = tmsp[:-5]
             first_words = words[0] + " " + words[1] + " " + words[2]
             message = line.replace(first_words, "").strip().replace('"', "'")
-            return (tmsp_without_microseconds, log_name, message)
-    return (None, None, None)
+            return SplitFields(
+                tmsp=tmsp_without_microseconds,
+                process_id="",
+                log=log_name,
+                message=message,
+            )
+    return None
 
 
 def create_treemap(df):

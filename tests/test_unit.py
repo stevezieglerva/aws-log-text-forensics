@@ -49,11 +49,27 @@ class ForensicsUnitTests(unittest.TestCase):
         # Assert
         self.assertEqual(
             results,
-            (
-                "2021-09-22T00:01:03",
-                "/aws/lambda/zillow-and-schools-ZillowParseIndividualHTMLFuncti-14FEP2JCS43HC",
-                "'eventSource': 'aws:s3',",
+            SplitFields(
+                tmsp="2021-09-22T00:01:03",
+                process_id="",
+                log="/aws/lambda/zillow-and-schools-ZillowParseIndividualHTMLFuncti-14FEP2JCS43HC",
+                message="'eventSource': 'aws:s3',",
             ),
+        )
+
+    def test_split_fields_from_line__given_line_has_no_slashes__then_none(
+        self,
+    ):
+        # Arrange
+        input = "testing line"
+        # Act
+        results = split_fields_from_line(input)
+        print(f"test results: {results}")
+
+        # Assert
+        self.assertEqual(
+            results,
+            None,
         )
 
 
