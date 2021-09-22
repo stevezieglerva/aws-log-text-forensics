@@ -25,7 +25,7 @@ def main():
             for line in lines:
                 total_lines = total_lines + 1
                 tmsp, log, message = split_fields_from_line(line)
-                print(tmsp, log)
+                # print(tmsp, log)
                 if tmsp != None:
                     tmsp_partition = tmsp.replace(":", "")
                     hour_partition = tmsp_partition[0:13]
@@ -37,7 +37,7 @@ def main():
                         new_lines[new_filename] = current_lines
                     else:
                         new_lines[new_filename] = [line]
-            print(new_lines)
+            # print(new_lines)
             for partition_log_name in new_lines:
                 print(partition_log_name)
                 with open(partition_log_name, "w") as partition:

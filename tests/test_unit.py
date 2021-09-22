@@ -36,7 +36,25 @@ class ForensicsUnitTests(unittest.TestCase):
         results = create_pattern_datehistogram(df, period_column_name)
 
         # Assert
-        self.assertEqual(results, "plot_x.png")
+        self.assertEqual(results, "search_date_histogram_by_pattern.png")
+
+    def test_split_fields_from_line__given_standard_cw_line__then_results_correct(self):
+        # Arrange
+        input = '/aws/lambda/zillow-and-schools-ZillowParseIndividualHTMLFuncti-14FEP2JCS43HC 2021/09/22/[$LATEST]83957b117bb64a47b39b4550425ee62a 2021-09-22T00:01:03.996Z "eventSource": "aws:s3",'
+
+        # Act
+        results = split_fields_from_line(input)
+        print(f"test results: {results}")
+
+        # Assert
+        self.assertEqual(
+            results,
+            (
+                "2021-09-22T00:01:03",
+                "/aws/lambda/zillow-and-schools-ZillowParseIndividualHTMLFuncti-14FEP2JCS43HC",
+                "'eventSource': 'aws:s3',",
+            ),
+        )
 
 
 if __name__ == "__main__":
