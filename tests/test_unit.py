@@ -51,7 +51,7 @@ class ForensicsUnitTests(unittest.TestCase):
             results,
             SplitFields(
                 tmsp="2021-09-22T00:01:03",
-                process_id="",
+                process_id="83957b117bb64a47b39b4550425ee62a",
                 log="/aws/lambda/zillow-and-schools-ZillowParseIndividualHTMLFuncti-14FEP2JCS43HC",
                 message="'eventSource': 'aws:s3',",
             ),

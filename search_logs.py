@@ -12,6 +12,7 @@ import matplotlib
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+from matplotlib.pyplot import subplot_mosaic
 from pandas.core.frame import DataFrame
 
 from Histogram import Histogram
@@ -35,6 +36,7 @@ class LineMatch:
     log: str
     message: str
     pattern_matches: List[PatternMatch]
+    process_id: str
 
 
 @dataclass(frozen=True)
@@ -234,8 +236,10 @@ def read_logs(
                 if split_fields is None:
                     continue
                 tmsp = split_fields.tmsp
-                message = split_fields.message
+                process_id = split_fields.process_id
+                message = process_id + " | " + split_fields.message
                 log = split_fields.log
+
                 if is_match(tmsp, message, args):
                     match_counts = match_counts + 1
                     output = output + f'{tmsp},"{log}","{message}",1\n'
@@ -246,6 +250,7 @@ def read_logs(
                             log=log,
                             message=message,
                             pattern_matches=pattern_matches,
+                            process_id=split_fields.process_id,
                         )
                     )
 
@@ -324,17 +329,19 @@ def count_matched_word_patterns(match_expression: str, text: str) -> List[Patter
 
 
 def split_fields_from_line(line):
+    # '/aws/lambda/zillow-and-schools-ZillowParseIndividualHTMLFuncti-14FEP2JCS43HC 2021/09/22/[$LATEST]83957b117bb64a47b39b4550425ee62a 2021-09-22T00:01:03.996Z "eventSource": "aws:s3",'
     if re.findall("^/", line):
         words = line.split(" ")
         if len(words) >= 3:
             log_name = words[0].strip()
             tmsp = words[2].strip()
             tmsp_without_microseconds = tmsp[:-5]
+            process_id = re.sub(r".*LATEST]", "", words[1])
             first_words = words[0] + " " + words[1] + " " + words[2]
             message = line.replace(first_words, "").strip().replace('"', "'")
             return SplitFields(
                 tmsp=tmsp_without_microseconds,
-                process_id="",
+                process_id=process_id,
                 log=log_name,
                 message=message,
             )
